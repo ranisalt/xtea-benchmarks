@@ -50,144 +50,81 @@ static void bench(Fn fn, Key key, benchmark::State &state) {
 }
 
 #define BM(x) BENCHMARK(x)->Range(8, max_length)->UseManualTime();
+#define BM_SKIP(...)
 
-static void encrypt_reinterpret(benchmark::State &state) {
-  bench<false>(xtea::encrypt_reinterpret, deadbeef, state);
+static void encrypt(benchmark::State &state) {
+  bench<false>(xtea::encrypt, deadbeef, state);
 }
-BM(encrypt_reinterpret);
+BM(encrypt);
 
-static void encrypt_memcpy(benchmark::State &state) {
-  bench<false>(xtea::encrypt_memcpy, deadbeef, state);
+static void encrypt_interleaved(benchmark::State &state) {
+  bench<false>(xtea::encrypt_interleaved, deadbeef, state);
 }
-BM(encrypt_memcpy);
+BM_SKIP(encrypt_interleaved);
 
-static void encrypt_reinterpret_interleaved(benchmark::State &state) {
-  bench<false>(xtea::encrypt_reinterpret_interleaved, deadbeef, state);
-}
-BM(encrypt_reinterpret_interleaved);
-
-static void encrypt_memcpy_interleaved(benchmark::State &state) {
-  bench<false>(xtea::encrypt_memcpy_interleaved, deadbeef, state);
-}
-BM(encrypt_memcpy_interleaved);
-
-static void encrypt_reinterpret_precomputed(benchmark::State &state) {
+static void encrypt_precomputed(benchmark::State &state) {
   auto ek0 = xtea::expand_key(deadbeef);
-  bench<false>(xtea::encrypt_reinterpret_precomputed, ek0, state);
+  bench<false>(xtea::encrypt_precomputed, ek0, state);
 }
-BM(encrypt_reinterpret_precomputed);
+BM(encrypt_precomputed);
 
-static void encrypt_memcpy_precomputed(benchmark::State &state) {
+static void encrypt_tfs(benchmark::State &state) {
   auto ek0 = xtea::expand_key(deadbeef);
-  bench<false>(xtea::encrypt_memcpy_precomputed, ek0, state);
+  bench<false>(xtea::encrypt_tfs, ek0, state);
 }
-BM(encrypt_memcpy_precomputed);
+BM(encrypt_tfs);
 
-static void
-encrypt_reinterpret_interleaved_precomputed(benchmark::State &state) {
+static void encrypt_interleaved_precomputed(benchmark::State &state) {
   auto ek0 = xtea::expand_key(deadbeef);
-  bench<false>(xtea::encrypt_reinterpret_interleaved_precomputed, ek0, state);
+  bench<false>(xtea::encrypt_interleaved_precomputed, ek0, state);
 }
-BM(encrypt_reinterpret_interleaved_precomputed);
+BM(encrypt_interleaved_precomputed);
 
-static void encrypt_memcpy_interleaved_precomputed(benchmark::State &state) {
+static void encrypt_keypair(benchmark::State &state) {
+  auto ek1 = xtea::expand_key_v2(deadbeef);
+  bench<false>(xtea::encrypt_keypair, ek1, state);
+}
+BM_SKIP(encrypt_keypair);
+
+static void encrypt_interleaved_keypair(benchmark::State &state) {
+  auto ek1 = xtea::expand_key_v2(deadbeef);
+  bench<false>(xtea::encrypt_interleaved_keypair, ek1, state);
+}
+BM(encrypt_interleaved_keypair);
+
+static void decrypt(benchmark::State &state) {
+  bench<true>(xtea::decrypt, deadbeef, state);
+}
+BM(decrypt);
+
+static void decrypt_interleaved(benchmark::State &state) {
+  bench<true>(xtea::decrypt_interleaved, deadbeef, state);
+}
+BM_SKIP(decrypt_interleaved);
+
+static void decrypt_precomputed(benchmark::State &state) {
   auto ek0 = xtea::expand_key(deadbeef);
-  bench<false>(xtea::encrypt_memcpy_interleaved_precomputed, ek0, state);
+  bench<true>(xtea::decrypt_precomputed, ek0, state);
 }
-BM(encrypt_memcpy_interleaved_precomputed);
+BM(decrypt_precomputed);
 
-static void encrypt_reinterpret_keypair(benchmark::State &state) {
-  auto ek1 = xtea::expand_key_v2(deadbeef);
-  bench<false>(xtea::encrypt_reinterpret_keypair, ek1, state);
-}
-BM(encrypt_reinterpret_keypair);
-
-static void encrypt_memcpy_keypair(benchmark::State &state) {
-  auto ek1 = xtea::expand_key_v2(deadbeef);
-  bench<false>(xtea::encrypt_memcpy_keypair, ek1, state);
-}
-BM(encrypt_memcpy_keypair);
-
-static void encrypt_reinterpret_interleaved_keypair(benchmark::State &state) {
-  auto ek1 = xtea::expand_key_v2(deadbeef);
-  bench<false>(xtea::encrypt_reinterpret_interleaved_keypair, ek1, state);
-}
-BM(encrypt_reinterpret_interleaved_keypair);
-
-static void encrypt_memcpy_interleaved_keypair(benchmark::State &state) {
-  auto ek1 = xtea::expand_key_v2(deadbeef);
-  bench<false>(xtea::encrypt_memcpy_interleaved_keypair, ek1, state);
-}
-BM(encrypt_memcpy_interleaved_keypair);
-
-static void decrypt_reinterpret(benchmark::State &state) {
-  bench<true>(xtea::decrypt_reinterpret, deadbeef, state);
-}
-BM(decrypt_reinterpret);
-
-static void decrypt_memcpy(benchmark::State &state) {
-  bench<true>(xtea::decrypt_memcpy, deadbeef, state);
-}
-BM(decrypt_memcpy);
-
-static void decrypt_reinterpret_interleaved(benchmark::State &state) {
-  bench<true>(xtea::decrypt_reinterpret_interleaved, deadbeef, state);
-}
-BM(decrypt_reinterpret_interleaved);
-
-static void decrypt_memcpy_interleaved(benchmark::State &state) {
-  bench<true>(xtea::decrypt_memcpy_interleaved, deadbeef, state);
-}
-BM(decrypt_memcpy_interleaved);
-
-static void decrypt_reinterpret_precomputed(benchmark::State &state) {
+static void decrypt_interleaved_precomputed(benchmark::State &state) {
   auto ek0 = xtea::expand_key(deadbeef);
-  bench<true>(xtea::decrypt_reinterpret_precomputed, ek0, state);
+  bench<true>(xtea::decrypt_interleaved_precomputed, ek0, state);
 }
-BM(decrypt_reinterpret_precomputed);
+BM_SKIP(decrypt_interleaved_precomputed);
 
-static void decrypt_memcpy_precomputed(benchmark::State &state) {
-  auto ek0 = xtea::expand_key(deadbeef);
-  bench<true>(xtea::decrypt_memcpy_precomputed, ek0, state);
-}
-BM(decrypt_memcpy_precomputed);
-
-static void
-decrypt_reinterpret_interleaved_precomputed(benchmark::State &state) {
-  auto ek0 = xtea::expand_key(deadbeef);
-  bench<true>(xtea::decrypt_reinterpret_interleaved_precomputed, ek0, state);
-}
-BM(decrypt_reinterpret_interleaved_precomputed);
-
-static void decrypt_memcpy_interleaved_precomputed(benchmark::State &state) {
-  auto ek0 = xtea::expand_key(deadbeef);
-  bench<true>(xtea::decrypt_memcpy_interleaved_precomputed, ek0, state);
-}
-BM(decrypt_memcpy_interleaved_precomputed);
-
-static void decrypt_reinterpret_keypair(benchmark::State &state) {
+static void decrypt_keypair(benchmark::State &state) {
   auto ek1 = xtea::expand_key_v2(deadbeef);
-  bench<true>(xtea::decrypt_reinterpret_keypair, ek1, state);
+  bench<true>(xtea::decrypt_keypair, ek1, state);
 }
-BM(decrypt_reinterpret_keypair);
+BM_SKIP(decrypt_keypair);
 
-static void decrypt_memcpy_keypair(benchmark::State &state) {
+static void decrypt_interleaved_keypair(benchmark::State &state) {
   auto ek1 = xtea::expand_key_v2(deadbeef);
-  bench<true>(xtea::decrypt_memcpy_keypair, ek1, state);
+  bench<true>(xtea::decrypt_interleaved_keypair, ek1, state);
 }
-BM(decrypt_memcpy_keypair);
-
-static void decrypt_reinterpret_interleaved_keypair(benchmark::State &state) {
-  auto ek1 = xtea::expand_key_v2(deadbeef);
-  bench<true>(xtea::decrypt_reinterpret_interleaved_keypair, ek1, state);
-}
-BM(decrypt_reinterpret_interleaved_keypair);
-
-static void decrypt_memcpy_interleaved_keypair(benchmark::State &state) {
-  auto ek1 = xtea::expand_key_v2(deadbeef);
-  bench<true>(xtea::decrypt_memcpy_interleaved_keypair, ek1, state);
-}
-BM(decrypt_memcpy_interleaved_keypair);
+BM(decrypt_interleaved_keypair);
 
 } // namespace
 
